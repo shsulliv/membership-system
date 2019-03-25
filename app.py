@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
-import random
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -27,13 +26,6 @@ class User(db.Model):
         self.mobile_number = mobile_number
         self.pin = pin
 
-    @staticmethod
-    def generate_number(size):
-        """Generates a random number of a certain size (number of digits)."""
-        range_start = 10 ** (size - 1)
-        range_end = (10 ** size) - 1
-        return random.randint(range_start, range_end)
-
 
 class UserSchema(ma.Schema):
     class Meta:
@@ -45,7 +37,7 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 
-# endpoint to create new user
+# Endpoint to create new user
 @app.route("/user/new", methods=["POST"])
 def add_user():
     card_number = request.json['card_number']
@@ -60,7 +52,7 @@ def add_user():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify(new_user)
+    return user_schema.jsonify(new_user)
 
 
 # Endpoint to show all users.
