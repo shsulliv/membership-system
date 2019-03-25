@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
+import random
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -19,11 +20,21 @@ class User(db.Model):
     pin = db.Column(db.Integer)
 
     def __init__(self, employee_id, full_name, email, mobile_number, pin):
+        self.card_number = __generate_card_number()
         self.employee_id = employee_id
         self.full_name = full_name
         self.email = email
         self.mobile_number = mobile_number
         self.pin = pin
+
+    @staticmethod
+    def __generate_card_number():
+        card_number = ''
+        # Card numbers should always be 10 digits long.
+        for x in range(10):
+            card_number.append(random.randomint(0, 9))
+        return int(card_number)
+
 
 
 class UserSchema(ma.Schema):
