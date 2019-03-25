@@ -12,15 +12,15 @@ ma = Marshmallow(app)
 
 
 class User(db.Model):
-    card_number = db.Column(db.Integer, primary_key=True, unique=True)
+    card_number = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.Integer, unique=True)
     full_name = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
     mobile_number = db.Column(db.Integer)
     pin = db.Column(db.Integer)
 
-    def __init__(self, employee_id, full_name, email, mobile_number, pin):
-        self.card_number = __generate_card_number()
+    def __init__(self, card_number, employee_id, full_name, email, mobile_number, pin):
+        self.card_number = card_number
         self.employee_id = employee_id
         self.full_name = full_name
         self.email = email
@@ -28,18 +28,16 @@ class User(db.Model):
         self.pin = pin
 
     @staticmethod
-    def __generate_card_number():
-        card_number = ''
-        # Card numbers should always be 10 digits long.
-        for x in range(10):
-            card_number.append(random.randomint(0, 9))
-        return int(card_number)
-
+    def generate_number(size):
+        """Generates a random number of a certain size (number of digits)."""
+        range_start = 10 ** (size - 1)
+        range_end = (10 ** size) - 1
+        return random.randint(range_start, range_end)
 
 
 class UserSchema(ma.Schema):
     class Meta:
-        # Fields to expose
+        # Fields to expose.
         fields = ('full_name', 'employee_id', 'email', 'mobile_number', 'card_number')
 
 
@@ -48,15 +46,16 @@ users_schema = UserSchema(many=True)
 
 
 # endpoint to create new user
-@app.route("/user", methods=["POST"])
+@app.route("/user/new", methods=["POST"])
 def add_user():
+    card_number = request.json['card_number']
     employee_id = request.json['employee_id']
     full_name = request.json['full_name']
     email = request.json['email']
     mobile_number = request.json['mobile_number']
     pin = request.json['pin']
 
-    new_user = User(employee_id, full_name, email, mobile_number, pin)
+    new_user = User(card_number, employee_id, full_name, email, mobile_number, pin)
 
     db.session.add(new_user)
     db.session.commit()
@@ -64,7 +63,7 @@ def add_user():
     return jsonify(new_user)
 
 
-# endpoint to show all users
+# Endpoint to show all users.
 @app.route("/user/all", methods=["GET"])
 def get_all():
     all_users = User.query.all()
@@ -72,14 +71,14 @@ def get_all():
     return jsonify(result.data)
 
 
-# endpoint to get a single user detail by card_number
+# Endpoint to get a single user by card_number.
 @app.route("/user/<card_number>", methods=["GET"])
 def get_user(card_number):
     user = User.query.get(card_number)
     return user_schema.jsonify(user)
 
 
-# endpoint to update user
+# Endpoint to update use.
 @app.route("/user/<card_number>", methods=["PUT"])
 def user_update(card_number):
     user = User.query.get(card_number)
@@ -97,7 +96,7 @@ def user_update(card_number):
     return user_schema.jsonify(user)
 
 
-# endpoint to delete user
+# Endpoint to delete user.
 @app.route("/user/<card_number>", methods=["DELETE"])
 def user_delete(card_number):
     user = User.query.get(card_number)
