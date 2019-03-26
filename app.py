@@ -97,7 +97,7 @@ def get_user(card_number):
 # Endpoint to update user. This endpoint is currently
 # limited to topping up the user's card.
 @app.route("/user/<card_number>", methods=["PUT"])
-def user_update(card_number):
+def update_user(card_number):
     user = User.query.get(card_number)
     top_up = request.json['card_balance']
 
@@ -109,7 +109,7 @@ def user_update(card_number):
 
 # Endpoint to delete user.
 @app.route("/user/<card_number>", methods=["DELETE"])
-def user_delete(card_number):
+def delete_user(card_number):
     user = User.query.get(card_number)
     db.session.delete(user)
     db.session.commit()
