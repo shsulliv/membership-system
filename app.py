@@ -92,7 +92,8 @@ def get_user(card_number):
         return 'No card found for that number in the system. Please register your card.'
 
 
-# Endpoint to update user.
+# Endpoint to update user. This endpoint is currently
+# limited to topping up the user's card.
 @app.route("/user/<card_number>", methods=["PUT"])
 def user_update(card_number):
     user = User.query.get(card_number)
@@ -101,7 +102,7 @@ def user_update(card_number):
     user.card_balance += top_up
 
     db.session.commit()
-    return 'Your card balance is now {}.'.format(user.card_balance)
+    return 'Your card balance is now &#163;{}.'.format(user.card_balance)
 
 
 # Endpoint to delete user.
