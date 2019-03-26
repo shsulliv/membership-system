@@ -1,13 +1,21 @@
-from flask import Flask, request, jsonify
+from datetime import timedelta
+from flask import Flask, request, jsonify, session, app
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
+
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'crud.sqlite')
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
 
 
 class User(db.Model):
@@ -59,10 +67,13 @@ def add_user():
     db.session.add(new_user)
     db.session.commit()
 
-    return user_schema.jsonify(new_user)
+    return 'Welcome {}! Your current card balance is &#163;{}.'\
+        .format(new_user.full_name, new_user.card_balance)
 
 
-# Endpoint to show all users.
+# Endpoint to show all users. This endpoint is primarily used for
+# testing that data bas been added to the database, which is why
+# it returns JSON and not a message.
 @app.route("/user/all", methods=["GET"])
 def get_all():
     all_users = User.query.all()
@@ -70,11 +81,15 @@ def get_all():
     return jsonify(result.data)
 
 
-# Endpoint to get a single user by card_number.
+# Endpoint to get a single user.
 @app.route("/user/<card_number>", methods=["GET"])
 def get_user(card_number):
     user = User.query.get(card_number)
-    return user_schema.jsonify(user)
+    if user:
+        return 'Welcome back {}! Your current card balance is &#163;{}.'\
+            .format(user.full_name, user.card_balance)
+    else:
+        return 'No card found for that number in the system. Please register your card.'
 
 
 # Endpoint to update user.
@@ -86,7 +101,7 @@ def user_update(card_number):
     user.card_balance += top_up
 
     db.session.commit()
-    return user_schema.jsonify(user)
+    return 'Your card balance is now {}.'.format(user.card_balance)
 
 
 # Endpoint to delete user.
@@ -96,7 +111,8 @@ def user_delete(card_number):
     db.session.delete(user)
     db.session.commit()
 
-    return user_schema.jsonify(user)
+    return 'Your account for card number {} has been deleted.'\
+        .format(user.card_number)
 
 
 if __name__ == '__main__':
