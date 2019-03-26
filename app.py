@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, session, app
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
+from random import randint
 
 
 app = Flask(__name__)
@@ -10,6 +11,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'crud.sqlite')
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+app.secret_key = str(randint(0, 1000))
 
 
 @app.before_request
@@ -72,8 +74,8 @@ def add_user():
 
 
 # Endpoint to show all users. This endpoint is primarily used for
-# testing that data bas been added to the database, which is why
-# it returns JSON and not a message.
+# testing that data has been correctly added to the database,
+# which is why it returns the JSON payload and not a message.
 @app.route("/user/all", methods=["GET"])
 def get_all():
     all_users = User.query.all()
