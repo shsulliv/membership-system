@@ -6,7 +6,8 @@ Membership system project for British Computing Society synoptic project.
 ```code
 python --version
 ```
-If you do not have Python currently installed, visit the Python site and follow the instructions to install the 2.7 version of the language on your operating system.
+If you do not have Python currently installed, visit the [Python site](https://www.python.org/) and follow the instructions to install the 2.7 version of the language on your operating system.
+
 2. Having pip installed. Pip already comes bundled with Python version 2.7 and higher, otherwise run the following two commands separately in your terminal:
 ```code
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
