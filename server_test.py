@@ -21,7 +21,7 @@ class ServerTest(unittest.TestCase):
         db.create_all()
 
     def tearDown(self):
-        pass
+        db.drop_all()
 
     def test_user_creation(self):
         """Tests user creation with valid card number."""
