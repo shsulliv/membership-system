@@ -14,6 +14,7 @@ ma = Marshmallow(app)
 app.secret_key = str(randint(0, 1000))
 
 
+# This session will timeout after five minutes of inactivity.
 @app.before_request
 def make_session_permanent():
     session.permanent = True
