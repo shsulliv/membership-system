@@ -17,7 +17,6 @@ class ServerTest(unittest.TestCase):
                                                 os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test.db')
         self.app = app.test_client()
         self.app.secret_key = 1
-        db.drop_all()
         db.create_all()
 
     def tearDown(self):
